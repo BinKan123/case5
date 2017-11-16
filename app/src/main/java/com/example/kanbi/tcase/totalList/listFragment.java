@@ -30,7 +30,7 @@ import java.util.List;
 import static android.R.attr.data;
 
 
-public class listFragment extends Fragment implements productAdapter.OnClickListener {
+public class listFragment extends Fragment  {
 
     private RecyclerView recyclerView;
     private productAdapter adapter;
@@ -76,7 +76,7 @@ public class listFragment extends Fragment implements productAdapter.OnClickList
                  //now add to the arraylist
                  productsList.add(productsData);
 
-                 adapter = new productAdapter(productsList,listFragment.this);
+                 adapter = new productAdapter(productsList);
                  //listFragment.this
                  recyclerView.setAdapter(adapter);
 
@@ -105,7 +105,7 @@ public class listFragment extends Fragment implements productAdapter.OnClickList
 
     }
 
-    @Override
+   /* @Override
     public void onFavClick(productDataModel favClicked) {
         /*favClicked.getImage();
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -126,4 +126,4 @@ public class listFragment extends Fragment implements productAdapter.OnClickList
 
 
     }
-}
+

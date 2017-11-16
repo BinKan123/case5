@@ -34,18 +34,18 @@ import static android.content.ContentValues.TAG;
 
 public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHolder> {
     //interface
-    private productAdapter.OnClickListener onClicklistener;
+   /* private productAdapter.OnClickListener onClicklistener;
 
     public interface OnClickListener {
         void onFavClick(productDataModel favClicked);
-    }
+    }*/
 
 
     private ArrayList<productDataModel> list;
-
-    public productAdapter(ArrayList<productDataModel> List,productAdapter.OnClickListener onClicklistener) {
+    //productAdapter.OnClickListener onClicklistener
+    public productAdapter(ArrayList<productDataModel> List) {
         list = List;
-        this.onClicklistener = onClicklistener;
+      //  this.onClicklistener = onClicklistener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -81,7 +81,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(productAdapter.ViewHolder holder, int i) {
+    public void onBindViewHolder(productAdapter.ViewHolder holder, final int i) {
         final productDataModel item = list.get(i);
 
         holder.currency.setText(item.getCurrency());
@@ -95,7 +95,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
         Picasso.with(context).load(item.getImage()).into(holder.image);
 
-        holder.favBtn.setOnClickListener(new View.OnClickListener() {
+        /*holder.favBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(onClicklistener!=null)
@@ -103,22 +103,21 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
                     onClicklistener.onFavClick(item);;
                 }
             }
-        });
+        });*/
 
         holder.favBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                 if (isChecked) {
-                    Toast.makeText(context, "Button is on",
+                    Toast.makeText(context, item.getTitle()+"  is added as favorite",
                             Toast.LENGTH_LONG).show();
-
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("favorite");
 
                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
-                                appleSnapshot.getRef().removeValue();
+                                ref.child("favorite").push().setValue(item);
                             }
                         }
 
@@ -130,10 +129,24 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
                 } else {
 
-                    Toast.makeText(context, "Button is off",
-                            Toast.LENGTH_LONG).show();
+                    ref.child("favorite").orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                                String itemKey = childSnapshot.getKey();
+                                ref.child("favorite").child(itemKey).removeValue();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.e(TAG, "onCancelled", databaseError.toException());
+                        }
+                    });
+
+
                 }
-                //story.comment.setShowAll(isChecked);
+
             }
         });
 

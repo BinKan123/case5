@@ -89,6 +89,10 @@ public class FirebaseHelper {
             productList.add(productsData);
         }
 
+        if(productList.size()>0){
+           // adapter=new productAdapter(productList,listFragment.this)
+        }
+
         }
     }
 
@@ -96,4 +100,4 @@ public class FirebaseHelper {
 
 
 
-}
+

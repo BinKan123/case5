@@ -33,8 +33,6 @@ public class favFragment extends Fragment  {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
 
-
-
     public favFragment() {
     }
 
@@ -46,21 +44,15 @@ public class favFragment extends Fragment  {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
-
-
         favList=new ArrayList<>();
 
-
         firebaseDatabase=FirebaseDatabase.getInstance();
-
-
 
         loadDataFromFirebase();
 
         return view;
 
     }
-
 
 
     private void loadDataFromFirebase() {
@@ -75,9 +67,6 @@ public class favFragment extends Fragment  {
 
                 adapter = new favAdapter(favList);
                 recyclerView.setAdapter(adapter);
-
-
-
 
 
             }

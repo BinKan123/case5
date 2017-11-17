@@ -101,10 +101,10 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
+                            //for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
 
                                 ref.child("favorite").push().setValue(item);
-                            }
+                           // }
                         }
 
                         @Override

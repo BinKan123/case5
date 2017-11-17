@@ -116,9 +116,6 @@ public class favAdapter extends RecyclerView.Adapter<favAdapter.ViewHolder> {
 });
 
 
-
-
-
     }
 
     @Override

@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
     //use viewpager to create navigationbar
 
     mViewPager = (ViewPager) findViewById(R.id.container);

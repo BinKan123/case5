@@ -13,9 +13,6 @@ public class favModel {
 
         public favModel() {}  // Needed for Firebase
 
-
-
-
         public favModel(Long id, String title, Long price, String currency, String imageURL) {
             this.id = id;
             this.title = title;

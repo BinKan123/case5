@@ -77,7 +77,7 @@ public class listFragment extends Fragment  {
                  productsList.add(productsData);
 
                  adapter = new productAdapter(productsList);
-                 //listFragment.this
+
                  recyclerView.setAdapter(adapter);
                  adapter.notifyDataSetChanged();
 
@@ -106,23 +106,7 @@ public class listFragment extends Fragment  {
 
     }
 
-   /* @Override
-    public void onFavClick(productDataModel favClicked) {
-        /*favClicked.getImage();
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(favClicked.getImage()));
-        startActivity(intent);*/
 
-
-        /*public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isChecked) {
-                // The toggle is enabled
-
-            } else {
-                // The toggle is disabled
-            }
-        }
-*/
 
 
 

@@ -33,19 +33,14 @@ import static android.content.ContentValues.TAG;
  */
 
 public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHolder> {
-    //interface
-   /* private productAdapter.OnClickListener onClicklistener;
 
-    public interface OnClickListener {
-        void onFavClick(productDataModel favClicked);
-    }*/
 
 
     private ArrayList<productDataModel> list;
-    //productAdapter.OnClickListener onClicklistener
+
     public productAdapter(ArrayList<productDataModel> List) {
         list = List;
-      //  this.onClicklistener = onClicklistener;
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -95,16 +90,6 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
         Picasso.with(context).load(item.getImage()).into(holder.image);
 
-        /*holder.favBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(onClicklistener!=null)
-                {
-                    onClicklistener.onFavClick(item);;
-                }
-            }
-        });*/
-
         holder.favBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -117,6 +102,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
+
                                 ref.child("favorite").push().setValue(item);
                             }
                         }
@@ -135,6 +121,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
                             for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
                                 String itemKey = childSnapshot.getKey();
                                 ref.child("favorite").child(itemKey).removeValue();
+                                notifyDataSetChanged();
                             }
                         }
 

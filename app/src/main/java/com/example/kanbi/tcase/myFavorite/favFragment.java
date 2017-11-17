@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 
-public class favFragment extends Fragment implements favAdapter.OnClickListener {
+public class favFragment extends Fragment  {
 
     private RecyclerView recyclerView;
     private favAdapter adapter;
@@ -31,6 +32,8 @@ public class favFragment extends Fragment implements favAdapter.OnClickListener 
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+
+
 
     public favFragment() {
     }
@@ -42,6 +45,7 @@ public class favFragment extends Fragment implements favAdapter.OnClickListener 
         recyclerView=(RecyclerView) view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+
 
 
         favList=new ArrayList<>();
@@ -69,14 +73,18 @@ public class favFragment extends Fragment implements favAdapter.OnClickListener 
                 //now add to the arraylist
                 favList.add(favData);
 
-                adapter = new favAdapter(favList,favFragment.this);
-
+                adapter = new favAdapter(favList);
                 recyclerView.setAdapter(adapter);
+
+
+
+
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
 
             }
 
@@ -98,24 +106,6 @@ public class favFragment extends Fragment implements favAdapter.OnClickListener 
 
     }
 
-    @Override
-    public void delClick(favModel delClicked) {
-        delClicked.getImage();
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(delClicked.getImage()));
-        startActivity(intent);
 
-
-        /*public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isChecked) {
-                // The toggle is enabled
-
-            } else {
-                // The toggle is disabled
-            }
-        }*/
-
-
-    }
 }
 

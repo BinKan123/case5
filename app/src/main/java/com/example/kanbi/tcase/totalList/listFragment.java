@@ -79,6 +79,7 @@ public class listFragment extends Fragment  {
                  adapter = new productAdapter(productsList);
                  //listFragment.this
                  recyclerView.setAdapter(adapter);
+                 adapter.notifyDataSetChanged();
 
              }
 

@@ -32,19 +32,13 @@ import static android.content.ContentValues.TAG;
  */
 
 public class favAdapter extends RecyclerView.Adapter<favAdapter.ViewHolder> {
-    //interface
-    private favAdapter.OnClickListener onClicklistener;
-
-    public interface OnClickListener {
-        void delClick(favModel delClicked);
-    }
 
 
     private ArrayList<favModel> list;
 
-    public favAdapter(ArrayList<favModel> List,favAdapter.OnClickListener onClicklistener) {
+    public favAdapter(ArrayList<favModel> List) {
         list = List;
-        this.onClicklistener = onClicklistener;
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -94,14 +88,35 @@ public class favAdapter extends RecyclerView.Adapter<favAdapter.ViewHolder> {
         Picasso.with(context).load(item.getImage()).into(holder.image);
 
         holder.delBtn.setOnClickListener(new View.OnClickListener() {
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
             @Override
             public void onClick(View view) {
-                if(onClicklistener!=null)
-                {
-                    onClicklistener.delClick(item);;
+
+        ref.child("favorite").orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                    String itemKey = childSnapshot.getKey();
+                    ref.child("favorite").child(itemKey).removeValue();
+                    notifyDataSetChanged();
+
                 }
             }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "onCancelled", databaseError.toException());
+            }
         });
+
+
+    }
+});
+
+
+
 
 
     }

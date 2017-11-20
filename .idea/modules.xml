@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Tcase-master.iml" filepath="$PROJECT_DIR$/Tcase-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/case5.iml" filepath="$PROJECT_DIR$/case5.iml" />
     </modules>
   </component>
 </project>

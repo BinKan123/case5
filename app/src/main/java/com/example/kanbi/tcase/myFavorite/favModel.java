@@ -11,6 +11,7 @@ public class favModel {
         private Long price;
         private String title;
 
+
         public favModel() {}  // Needed for Firebase
 
         public favModel(Long id, String title, Long price, String currency, String imageURL) {

@@ -1,6 +1,7 @@
 package com.example.kanbi.tcase.totalList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.kanbi.tcase.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by kanbi on 15/11/2017.
@@ -35,14 +39,16 @@ import static android.content.ContentValues.TAG;
 public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHolder> {
 
 
-
     private ArrayList<productDataModel> list;
     private ArrayList<Object> products;
     private ArrayList<Object> favorites;
     private DatabaseReference ref;
 
+
+
     public productAdapter(ArrayList<productDataModel> List) {
         list = List;
+
         ref = FirebaseDatabase.getInstance().getReference();
 
         ref.addValueEventListener(new ValueEventListener() {
@@ -73,16 +79,21 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
         public ToggleButton favBtn;
 
+        DatabaseReference mDatabaseFav;
+
         public ViewHolder(View itemView) {
             super(itemView);
 
-            currency=(TextView) itemView.findViewById(R.id.currency);
-            id=(TextView) itemView.findViewById(R.id.id);
-            image=(ImageView) itemView.findViewById(R.id.productImg);
-            price=(TextView) itemView.findViewById(R.id.price);
-            title=(TextView) itemView.findViewById(R.id.title);
+            currency = (TextView) itemView.findViewById(R.id.currency);
+            id = (TextView) itemView.findViewById(R.id.id);
+            image = (ImageView) itemView.findViewById(R.id.productImg);
+            price = (TextView) itemView.findViewById(R.id.price);
+            title = (TextView) itemView.findViewById(R.id.title);
 
-            favBtn=(ToggleButton) itemView.findViewById(R.id.toggleButton);
+            favBtn = (ToggleButton) itemView.findViewById(R.id.toggleButton);
+
+            mDatabaseFav = FirebaseDatabase.getInstance().getReference().child("favorite");
+            mDatabaseFav.keepSynced(true);
         }
 
     }
@@ -90,13 +101,22 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
     @Override
     public productAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View itemView =  LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.product_card, viewGroup, false);
+        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.product_card, viewGroup, false);
 
         return new ViewHolder(itemView);
     }
 
+
+
     @Override
     public void onBindViewHolder(final productAdapter.ViewHolder holder, final int i) {
+
+        if (holder.favBtn.isChecked()){
+            holder.favBtn.setBackgroundResource(R.drawable.ic_fav_on);
+        }else{
+            holder.favBtn.setBackgroundResource(R.drawable.ic_favorite);
+        }
+
         final productDataModel item = list.get(i);
 
         holder.currency.setText(item.getCurrency());
@@ -110,115 +130,73 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ViewHold
 
 
 
-        //to ensure toggle button shows the right status when populating list
+        holder.favBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
 
-        ref.child("favorite-ids").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Object snapshotValue = dataSnapshot.getValue();
+    {
+        @Override
+        public void onCheckedChanged (CompoundButton buttonView,boolean isChecked){
+            final String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                Log.d("FAVORITE_IDS", snapshotValue.toString());
-            }
+        if (isChecked) {
+            holder.favBtn.setBackgroundResource(R.drawable.ic_fav_on);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
-            }
-        });
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        ref.child("favorite").child(uId).push().setValue(item);
+
+                        Toast.makeText(context, item.getTitle() + "  is added as favorite",
+                                Toast.LENGTH_LONG).show();
 
 
-        /*ref.child("favorite").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //for (DataSnapshot  appleSnapshot: dataSnapshot.getChildren()) {
-                    //Object value = appleSnapshot.getValue().;
-                    if (dataSnapshot.exists()){
-                        ref.child("favorite").orderByChild("title").equalTo(item.getTitle());
-                        holder.favBtn.setBackgroundResource(R.drawable.ic_fav_on);
-
-                    }
-                    else{
-
-                        holder.favBtn.setBackgroundResource(R.drawable.ic_favorite);
-
+                        holder.favBtn.setSelected(true);
+                        holder.favBtn.setSaveEnabled(false);
+                        notifyDataSetChanged();
                     }
 
+
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e(TAG, "onCancelled", databaseError.toException());
+                }
+            });
+
+        } else {
+
+            holder.favBtn.setBackgroundResource(R.drawable.ic_favorite);
+
+            ref.child("favorite").child(uId).orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                        String itemKey = childSnapshot.getKey();
+
+                        ref.child("favorite").child(uId).child(itemKey).removeValue();
+                        Toast.makeText(context, item.getTitle() + "  has been removed from favorite",
+                                Toast.LENGTH_LONG).show();
+
+                        holder.favBtn.setSelected(false);
+                        holder.favBtn.setSaveEnabled(false);
+
+                        notifyDataSetChanged();
+                    }
                 }
 
-          // }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled", databaseError.toException());
-            }
-        });
-*/
-
-
-        holder.favBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Toast.makeText(context, item.getTitle()+"  is added as favorite",
-                            Toast.LENGTH_LONG).show();
-                    if (favoritesMap.) {
-                        ref.child("favorite").push().setValue(item);
-                    }
-                   /* ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            //for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
-                            if (!dataSnapshot.hasChild(item.getTitle())) {
-                                holder.favBtn.setBackgroundResource(R.drawable.ic_fav_on);
-
-                                ref.child("favorite").push().setValue(item);
-
-
-                                ref.child("favorite-ids").push().setValue(item.getId());
-
-                            }else{
-                                Toast.makeText(context, item.getTitle()+"  has already been added as favorite",
-                                        Toast.LENGTH_LONG).show();
-
-
-                            }
-
-                            // }
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.e(TAG, "onCancelled", databaseError.toException());
-                        }
-                    });*/
-
-                } else {
-
-                    ref.child("favorite").orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                String itemKey = childSnapshot.getKey();
-                                ref.child("favorite").child(itemKey).removeValue();
-                                holder.favBtn.setBackgroundResource(R.drawable.ic_favorite);
-                                notifyDataSetChanged();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.e(TAG, "onCancelled", databaseError.toException());
-                        }
-                    });
-
-
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e(TAG, "onCancelled", databaseError.toException());
                 }
+            });
 
-            }
-        });
+        }
 
     }
+    });
+
+}
 
     @Override
     public int getItemCount() {

@@ -21,8 +21,10 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private TabLayout tabLayout;
     public int[] tabIcons = {
+         //   R.drawable.ic_log,
             R.drawable.bag,
             R.drawable.fav,
+
 
     };
 
@@ -75,14 +77,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager){
         NaviPageAdapter adapter=new NaviPageAdapter(getSupportFragmentManager());
+       // adapter.addFragment(new logInFragment(),"LogIn");
         adapter.addFragment(new listFragment(),"List");
         adapter.addFragment(new favFragment(),"Favorite");
+
+
 
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(2);
     }
 
     private void createTabIcons() {
+       // tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
     }

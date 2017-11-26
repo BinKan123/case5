@@ -16,6 +16,7 @@ import android.widget.ToggleButton;
 import com.example.kanbi.tcase.R;
 import com.example.kanbi.tcase.totalList.productAdapter;
 import com.example.kanbi.tcase.totalList.productDataModel;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -73,7 +74,7 @@ public class favAdapter extends RecyclerView.Adapter<favAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(favAdapter.ViewHolder holder, final int i) {
+    public void onBindViewHolder(final favAdapter.ViewHolder holder, final int i) {
         final favModel item = list.get(i);
 
         holder.currency.setText(item.getCurrency());
@@ -90,16 +91,24 @@ public class favAdapter extends RecyclerView.Adapter<favAdapter.ViewHolder> {
         holder.delBtn.setOnClickListener(new View.OnClickListener() {
             final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
+
             @Override
             public void onClick(View view) {
+                final String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                int position = holder.getAdapterPosition();
+             //   DatabaseReference currRef = favAdapter.getRef(position);
 
-        ref.child("favorite").orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                ref.child("favorite").child(uId).orderByChild("title").equalTo(item.getTitle()).addListenerForSingleValueEvent(new ValueEventListener() {
+
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
                     String itemKey = childSnapshot.getKey();
-                    ref.child("favorite").child(itemKey).removeValue();
+                    ref.child("favorite").child(uId).child(itemKey).removeValue();
+                    Toast.makeText(context, item.getTitle() + "  has been removed from favorite",
+                            Toast.LENGTH_LONG).show();
                     notifyDataSetChanged();
 
                 }
